@@ -39,7 +39,7 @@ enclist = []
 for enc in encs:
    enclist.append(enc.get_charset())
 
-print enclist
+#print enclist
 
 current = 0
 int1251 = 0
@@ -48,7 +48,7 @@ intkoi8r= 0
 
 if len(enclist) > 0:
  while current < len(enclist):
-  print(current, ".", enclist[current])
+#  print(current, ".", enclist[current])
 
   if enclist[current] ==  "WINDOWS-1251":
     int1251 = current
@@ -190,21 +190,19 @@ class mencode(GObject.Object, Gedit.WindowActivatable):
         doc = self.window.get_active_document()
         if not doc:
             return
-        print int1251
+#        print int1251
         doc.load(Gio.file_new_for_commandline_arg(doc.get_uri_for_display()), Gedit.encoding_get_from_index(int1251), 0, 0, False)
 
     def to_cp866(self, action):
         doc = self.window.get_active_document()
         if not doc:
             return
-        print int866
         doc.load(Gio.file_new_for_commandline_arg(doc.get_uri_for_display()), Gedit.encoding_get_from_index(int866), 0, 0, False)
 
     def to_koi8r(self, action):
         doc = self.window.get_active_document()
         if not doc:
             return
-        print int866
         doc.load(Gio.file_new_for_commandline_arg(doc.get_uri_for_display()), Gedit.encoding_get_from_index(intkoi8r), 0, 0, False)
 
 
