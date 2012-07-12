@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-# version 1.0
+# version 1.1
 
 from gettext import gettext as _
 from gi.repository import GObject, Gtk, Gedit, Gio
@@ -39,7 +39,7 @@ enclist = []
 for enc in encs:
    enclist.append(enc.get_charset())
 
-#print enclist
+print enclist
 
 current = 0
 int1251 = 0
@@ -48,7 +48,7 @@ intkoi8r= 0
 
 if len(enclist) > 0:
  while current < len(enclist):
-#  print(current, ".", enclist[current])
+  print(current, ".", enclist[current])
 
   if enclist[current] ==  "WINDOWS-1251":
     int1251 = current
@@ -58,6 +58,33 @@ if len(enclist) > 0:
     intkoi8r = current
 
   current = current + 1
+
+ui7 = """<ui>
+<menubar name="MenuBar">
+<placeholder name="menu_2">
+<separator />
+<separator />
+<menu name="menu_codepage" action="codepage_act">
+<menuitem name="menu1251" action="action1251"/>
+<separator />
+<menuitem name="menu866" action="action866"/>
+<separator />
+<menuitem name="menukoi8r" action="actionkoi8r" />
+<separator />
+
+</menu>
+</placeholder>
+</menubar>
+
+    <toolbar name="ToolBar">
+        <separator />
+        <toolitem name="Encode1" action="action1251" />
+        <toolitem name="Encode2" action="action866" />
+        <toolitem name="Encode3" action="actionkoi8r" />
+    </toolbar>
+
+</ui>
+"""
 
 
 UI_XML0 = """<ui>
@@ -93,14 +120,21 @@ UI_XML2 = """<ui>
 
 # Menu item
 ui_str = """<ui>
- <menubar name="MenuBar">
-   <menu name="ToolsMenu" action="Tools">
-     <placeholder name="ToolsOps_9">
-        <menuitem name="Codepage" action="Codepage"/>
-      </placeholder>
+<menubar name="MenuBar">
+<placeholder name="menu_2">
+<separator />
+<separator />
+<menu name="menu_codepage" action="codepage_act">
+<menuitem name="menu1251" action="action1251"/>
+<separator />
+<menuitem name="menu866" action="action866"/>
+<separator />
+<menuitem name="menukoi8r" action="actionkoi8r" />
+<separator />
 %s
-    </menu>
- </menubar>
+</menu>
+</placeholder>
+</menubar>
 </ui>
 """ % "\n".join(["<menuitem name=\"Encoding%i\" action=\"Encoding%i\"/>" % (i, i) for i in range(len(enclist))])
 
@@ -122,33 +156,38 @@ class mencode(GObject.Object, Gedit.WindowActivatable):
 
 
     def _insert_menu(self):
+
         manager = self.window.get_ui_manager()
-        self._actions = Gtk.ActionGroup("CP07Actions")
+
+
+        self._actions = Gtk.ActionGroup("menu_codepage")
         self._actions.add_actions([
-            ('CPAction', Gtk.STOCK_INFO, "WINDOWS-1251", 
-                 None, "Document to codepage Windows-1251", 
-                 self.to_cp1251),
-        ])
+            ('codepage_act', Gtk.STOCK_INFO, "Codepage",    None, "Document to codepage Windows-1251", 
+                 self.codepage), ])
+        manager.insert_action_group(self._actions)
+        self._ui_merge_id = manager.add_ui_from_string(ui7)
+        manager.ensure_update()
+
+        self._actions = Gtk.ActionGroup("group1251")
+        self._actions.add_actions([
+            ('action1251', Gtk.STOCK_INFO, "WINDOWS-1251",    None, "Document to codepage Windows-1251", 
+                 self.to_cp1251), ])
         manager.insert_action_group(self._actions)
         self._ui_merge_id = manager.add_ui_from_string(UI_XML0)
         manager.ensure_update()
         
-        self._actions = Gtk.ActionGroup("CP08Actions")
+        self._actions = Gtk.ActionGroup("group866")
         self._actions.add_actions([
-            ('CPAction1', Gtk.STOCK_INFO, "CP866", 
-                 None, "Document to codepage CP866", 
-                 self.to_cp866),
-        ])
+            ('action866', Gtk.STOCK_INFO, "CP866",  None, "Document to codepage CP866", 
+                 self.to_cp866), ])
         manager.insert_action_group(self._actions)
         self._ui_merge_id = manager.add_ui_from_string(UI_XML1)
         manager.ensure_update()
     
-        self._actions = Gtk.ActionGroup("CP09Actions")
+        self._actions = Gtk.ActionGroup("groupkoi8r")
         self._actions.add_actions([
-            ('CPAction2', Gtk.STOCK_INFO, "KOI8R", 
-                 None, "Document to codepage KOI8R", 
-                 self.to_koi8r),
-        ])
+            ('actionkoi8r', Gtk.STOCK_INFO, "KOI8R",  None, "Document to codepage KOI8R", 
+                 self.to_koi8r), ])
         manager.insert_action_group(self._actions)
         self._ui_merge_id = manager.add_ui_from_string(UI_XML2)
         manager.ensure_update()
@@ -190,7 +229,6 @@ class mencode(GObject.Object, Gedit.WindowActivatable):
         doc = self.window.get_active_document()
         if not doc:
             return
-#        print int1251
         doc.load(Gio.file_new_for_commandline_arg(doc.get_uri_for_display()), Gedit.encoding_get_from_index(int1251), 0, 0, False)
 
     def to_cp866(self, action):
@@ -205,4 +243,7 @@ class mencode(GObject.Object, Gedit.WindowActivatable):
             return
         doc.load(Gio.file_new_for_commandline_arg(doc.get_uri_for_display()), Gedit.encoding_get_from_index(intkoi8r), 0, 0, False)
 
+    def codepage(self, action):
+        if not doc:
+            return
 
