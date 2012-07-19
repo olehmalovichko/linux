@@ -16,7 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-# version 1.1
+# version 1.2
 
 from gettext import gettext as _
 from gi.repository import GObject, Gtk, Gedit, Gio
@@ -68,6 +68,8 @@ UI_XML = """<ui>
         <menuitem name="Action1" action="action1251"/>
         <menuitem name="Action2" action="action866"/>
         <menuitem name="Action3" action="actionkoi8r"/>
+        <menuitem name="Action4" action="actionutf8"/>
+        <separator/>
         <menu action="SubMenuAction">
 %s
         </menu>
@@ -135,6 +137,13 @@ class ExamplePlugin04(GObject.Object, Gedit.WindowActivatable):
         manager.insert_action_group(self._actions)
         
 
+        self._actions = Gtk.ActionGroup("grouputf8")
+        self._actions.add_actions([
+            ('actionutf8', Gtk.STOCK_INFO, "UTF-8",  None, "Документ в кодировку UTF-8", 
+                 self.to_utf8), ])
+        manager.insert_action_group(self._actions)
+
+
         self._action_group = Gtk.ActionGroup("Codepage")
 
         self._action_group.add_actions([("Codepage", None, _("CODEPAGE:"))] + \
@@ -195,4 +204,10 @@ class ExamplePlugin04(GObject.Object, Gedit.WindowActivatable):
         if not doc:
             return
         doc.load(Gio.file_new_for_commandline_arg(doc.get_uri_for_display()), Gedit.encoding_get_from_index(intkoi8r), 0, 0, False)
+
+    def to_utf8(self, action):
+        doc = self.window.get_active_document()
+        if not doc:
+            return
+        doc.load(Gio.file_new_for_commandline_arg(doc.get_uri_for_display()), Gedit.encoding_get_current(), 0, 0, False)
 
