@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # Open the document in a different encoding
 # Install: copy mencode.plugin and mencode.py to ~/.local/share/gedit/plugins/
 # Copyright (C) 2012 Oleg Malovichko privatbank@gmail.com
@@ -39,7 +40,7 @@ enclist = []
 for enc in encs:
    enclist.append(enc.get_charset())
 
-print enclist
+#print enclist
 
 current = 0
 int1251 = 0
@@ -48,7 +49,7 @@ intkoi8r= 0
 
 if len(enclist) > 0:
  while current < len(enclist):
-  print(current, ".", enclist[current])
+#  print(current, ".", enclist[current])
 
   if enclist[current] ==  "WINDOWS-1251":
     int1251 = current
@@ -59,170 +60,122 @@ if len(enclist) > 0:
 
   current = current + 1
 
-ui7 = """<ui>
+
+UI_XML = """<ui>
 <menubar name="MenuBar">
-<placeholder name="menu_2">
-<separator />
-<separator />
-<menu name="menu_codepage" action="codepage_act">
-<menuitem name="menu1251" action="action1251"/>
-<separator />
-<menuitem name="menu866" action="action866"/>
-<separator />
-<menuitem name="menukoi8r" action="actionkoi8r" />
-<separator />
-
-</menu>
-</placeholder>
-</menubar>
-
-    <toolbar name="ToolBar">
-        <separator />
-        <toolitem name="Encode1" action="action1251" />
-        <toolitem name="Encode2" action="action866" />
-        <toolitem name="Encode3" action="actionkoi8r" />
-    </toolbar>
-
-</ui>
-"""
-
-
-UI_XML0 = """<ui>
-<menubar name="MenuBar">
-    <menu name="EditMenu" action="Edit">
-      <placeholder name="EditOps_7">
-        <menuitem name="CPAction" action="CPAction"/>
-      </placeholder>
-     </menu>
-   </menubar>
-</ui>"""
-
-UI_XML1 = """<ui>
-<menubar name="MenuBar">
-    <menu name="EditMenu" action="Edit">
-      <placeholder name="EditOps_8">
-        <menuitem name="CPAction1" action="CPAction1"/>
-      </placeholder>
-     </menu>
-   </menubar>
-</ui>"""
-
-UI_XML2 = """<ui>
-<menubar name="MenuBar">
-    <menu name="EditMenu" action="Edit">
-      <placeholder name="EditOps_9">
-        <menuitem name="CPAction2" action="CPAction2"/>
-      </placeholder>
-     </menu>
-   </menubar>
-</ui>"""
-
-
-# Menu item
-ui_str = """<ui>
-<menubar name="MenuBar">
-<placeholder name="menu_2">
-<separator />
-<separator />
-<menu name="menu_codepage" action="codepage_act">
-<menuitem name="menu1251" action="action1251"/>
-<separator />
-<menuitem name="menu866" action="action866"/>
-<separator />
-<menuitem name="menukoi8r" action="actionkoi8r" />
-<separator />
+    <menu name="rootMenu" action="rootMenuAction">
+        <placeholder>
+        <menuitem name="Action1" action="action1251"/>
+        <menuitem name="Action2" action="action866"/>
+        <menuitem name="Action3" action="actionkoi8r"/>
+        <menu action="SubMenuAction">
 %s
-</menu>
-</placeholder>
+        </menu>
+        </placeholder>
+    </menu>
 </menubar>
-</ui>
-""" % "\n".join(["<menuitem name=\"Encoding%i\" action=\"Encoding%i\"/>" % (i, i) for i in range(len(enclist))])
+</ui>""" % "\n".join(["<menuitem name=\"Encoding%i\" action=\"Encoding%i\"/>" % (i, i) for i in range(len(enclist))])
 
-class mencode(GObject.Object, Gedit.WindowActivatable):
-    __gtype_name__ = "mencode"
+
+class ExamplePlugin04(GObject.Object, Gedit.WindowActivatable):
+    __gtype_name__ = "ExamplePlugin04"
     window = GObject.property(type=Gedit.Window)
-
+   
     def __init__(self):
-     GObject.Object.__init__(self)
-
-    def do_activate(self):
-        # Insert menu items
-        self._insert_menu()
-
-    def do_deactivate(self):
-        # Remove any installed menu items
-        self._remove_menu()
-        self._action_group = None
-
-
-    def _insert_menu(self):
-
+        GObject.Object.__init__(self)
+    
+    def _add_ui(self):
         manager = self.window.get_ui_manager()
+        
+        #action_filemenu = Gtk.ActionGroup("test", "File", None, None)
+        #self._actions.add_actions(action_filemenu)
 
-
-        self._actions = Gtk.ActionGroup("menu_codepage")
+        self._actions = Gtk.ActionGroup("rootMenuGroup")
         self._actions.add_actions([
-            ('codepage_act', Gtk.STOCK_INFO, "Codepage",    None, "Document to codepage Windows-1251", 
-                 self.codepage), ])
+            ('rootMenuAction', Gtk.STOCK_INFO, "Кодировка", 
+                None, "Открыть текущий документ в другой кодировке", 
+                self.on_example_action_activate2),
+        ])
         manager.insert_action_group(self._actions)
-        self._ui_merge_id = manager.add_ui_from_string(ui7)
-        manager.ensure_update()
+
+                
+        self._actions = Gtk.ActionGroup("SubMenu")
+        self._actions.add_actions([
+            ('SubMenuAction', Gtk.STOCK_INFO, "Другие кодировки", 
+                None, "Список кодировок", 
+                self.on_example_action_activate2),
+        ])
+        manager.insert_action_group(self._actions)
+
+#        self._actions = Gtk.ActionGroup("Example04Actions")
+#        self._actions.add_actions([
+#            ('ExampleAction', Gtk.STOCK_INFO, "Say _Hello", 
+#                None, "Say hello to the current document", 
+#                self.on_example_action_activate),
+#        ])
+#        manager.insert_action_group(self._actions)
+
 
         self._actions = Gtk.ActionGroup("group1251")
         self._actions.add_actions([
-            ('action1251', Gtk.STOCK_INFO, "WINDOWS-1251",    None, "Document to codepage Windows-1251", 
+            ('action1251', Gtk.STOCK_INFO, "WINDOWS-1251",    None, "Документ в кодировку Windows-1251", 
                  self.to_cp1251), ])
         manager.insert_action_group(self._actions)
-        self._ui_merge_id = manager.add_ui_from_string(UI_XML0)
-        manager.ensure_update()
         
         self._actions = Gtk.ActionGroup("group866")
         self._actions.add_actions([
-            ('action866', Gtk.STOCK_INFO, "CP866",  None, "Document to codepage CP866", 
+            ('action866', Gtk.STOCK_INFO, "CP866",  None, "Документ в кодировку CP866", 
                  self.to_cp866), ])
         manager.insert_action_group(self._actions)
-        self._ui_merge_id = manager.add_ui_from_string(UI_XML1)
-        manager.ensure_update()
     
         self._actions = Gtk.ActionGroup("groupkoi8r")
         self._actions.add_actions([
-            ('actionkoi8r', Gtk.STOCK_INFO, "KOI8R",  None, "Document to codepage KOI8R", 
+            ('actionkoi8r', Gtk.STOCK_INFO, "KOI8R",  None, "Документ в кодировку KOI8R", 
                  self.to_koi8r), ])
         manager.insert_action_group(self._actions)
-        self._ui_merge_id = manager.add_ui_from_string(UI_XML2)
-        manager.ensure_update()
+        
 
-        # Get the Gtk.UIManager
-        manager = self.window.get_ui_manager()
-
-# -------------------
-        # Create a new action group
         self._action_group = Gtk.ActionGroup("Codepage")
 
         self._action_group.add_actions([("Codepage", None, _("CODEPAGE:"))] + \
-           [("Encoding%i" % i, None, enclist[i], None, _("Document to codepage ")+" "+enclist[i],
+           [("Encoding%i" % i, None, enclist[i], None, _("Документ в кодировку ")+" "+enclist[i],
            functools.partial(self.reopen_document, enc=enclist[i], ii=i )) \
            for i in range(len(enclist))])
         manager.insert_action_group(self._action_group, -1)
 
-        # Merge the UI
-        self._ui_id = manager.add_ui_from_string(ui_str)
+        
+        self._ui_merge_id = manager.add_ui_from_string(UI_XML)
+        manager.ensure_update()
+        
+        
+    def do_activate(self):
+        self._add_ui()
+
+    def do_deactivate(self):
+        self._remove_ui()
+
+    def do_update_state(self):
+        pass
+    
+    def on_example_action_activate(self, action, data=None):
+        view = self.window.get_active_view()
+        if view:
+            view.get_buffer().insert_at_cursor("Hello World! %D0%97%D0%B0%D0%B3%D0%BB%D0%B0%D0%")
+            
+    def on_example_action_activate2(self, action, data=None):
+        view = self.window.get_active_view()
+               
+    def _remove_ui(self):
+        manager = self.window.get_ui_manager()
+        manager.remove_ui(self._ui_merge_id)
+        manager.remove_action_group(self._actions)
+        manager.ensure_update()
 
     def reopen_document(self, action, enc,ii):
         doc = self.window.get_active_document()
         if not doc:
             return
         doc.load(Gio.file_new_for_commandline_arg(doc.get_uri_for_display()), Gedit.encoding_get_from_index(ii), 0, 0, False)
-
-
-    def _remove_menu(self):
-        # Get the Gtk.UIManager
-        manager = self.window.get_ui_manager()
-        # Remove the ui
-        manager.remove_ui(self._ui_id)
-        # Remove the action group
-        manager.remove_action_group(self._action_group)
-        # Make sure the manager updates
 
     # Menu activate handlers
     def to_cp1251(self, action):
@@ -242,8 +195,4 @@ class mencode(GObject.Object, Gedit.WindowActivatable):
         if not doc:
             return
         doc.load(Gio.file_new_for_commandline_arg(doc.get_uri_for_display()), Gedit.encoding_get_from_index(intkoi8r), 0, 0, False)
-
-    def codepage(self, action):
-        if not doc:
-            return
 
