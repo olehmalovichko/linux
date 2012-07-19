@@ -94,7 +94,7 @@ class ExamplePlugin04(GObject.Object, Gedit.WindowActivatable):
 
         self._actions = Gtk.ActionGroup("rootMenuGroup")
         self._actions.add_actions([
-            ('rootMenuAction', Gtk.STOCK_INFO, "Кодировка", 
+            ('rootMenuAction', Gtk.STOCK_UNDERLINE, "Кодировка", 
                 None, "Открыть текущий документ в другой кодировке", 
                 self.on_example_action_activate2),
         ])
@@ -103,7 +103,7 @@ class ExamplePlugin04(GObject.Object, Gedit.WindowActivatable):
                 
         self._actions = Gtk.ActionGroup("SubMenu")
         self._actions.add_actions([
-            ('SubMenuAction', Gtk.STOCK_INFO, "Другие кодировки", 
+            ('SubMenuAction', Gtk.STOCK_PASTE, "Другие кодировки", 
                 None, "Список кодировок", 
                 self.on_example_action_activate2),
         ])
@@ -120,26 +120,26 @@ class ExamplePlugin04(GObject.Object, Gedit.WindowActivatable):
 
         self._actions = Gtk.ActionGroup("group1251")
         self._actions.add_actions([
-            ('action1251', Gtk.STOCK_INFO, "WINDOWS-1251",    None, "Документ в кодировку Windows-1251", 
+            ('action1251', Gtk.STOCK_DND_MULTIPLE, "WINDOWS-1251",    None, "Документ в кодировку Windows-1251", 
                  self.to_cp1251), ])
         manager.insert_action_group(self._actions)
         
         self._actions = Gtk.ActionGroup("group866")
         self._actions.add_actions([
-            ('action866', Gtk.STOCK_INFO, "CP866",  None, "Документ в кодировку CP866", 
+            ('action866', Gtk.STOCK_DND_MULTIPLE, "CP866",  None, "Документ в кодировку CP866", 
                  self.to_cp866), ])
         manager.insert_action_group(self._actions)
     
         self._actions = Gtk.ActionGroup("groupkoi8r")
         self._actions.add_actions([
-            ('actionkoi8r', Gtk.STOCK_INFO, "KOI8R",  None, "Документ в кодировку KOI8R", 
+            ('actionkoi8r', Gtk.STOCK_DND_MULTIPLE, "KOI8R",  None, "Документ в кодировку KOI8R", 
                  self.to_koi8r), ])
         manager.insert_action_group(self._actions)
         
 
         self._actions = Gtk.ActionGroup("grouputf8")
         self._actions.add_actions([
-            ('actionutf8', Gtk.STOCK_INFO, "UTF-8",  None, "Документ в кодировку UTF-8", 
+            ('actionutf8', Gtk.STOCK_DND_MULTIPLE, "UTF-8",  None, "Документ в кодировку UTF-8", 
                  self.to_utf8), ])
         manager.insert_action_group(self._actions)
 
@@ -147,7 +147,7 @@ class ExamplePlugin04(GObject.Object, Gedit.WindowActivatable):
         self._action_group = Gtk.ActionGroup("Codepage")
 
         self._action_group.add_actions([("Codepage", None, _("CODEPAGE:"))] + \
-           [("Encoding%i" % i, None, enclist[i], None, _("Документ в кодировку ")+" "+enclist[i],
+           [("Encoding%i" % i, Gtk.STOCK_DND_MULTIPLE, enclist[i], None, _("Документ в кодировку ")+" "+enclist[i],
            functools.partial(self.reopen_document, enc=enclist[i], ii=i )) \
            for i in range(len(enclist))])
         manager.insert_action_group(self._action_group, -1)
