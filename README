@@ -5,7 +5,7 @@
 
 Plugin for gedit - recoding the file
 For installation, run the install.sh
-In gedit Edit-Settings-Modules deliver daw "Character Encoding"
+In gedit Edit-Settings-Modules check "Character Encoding"
 In the main menu appears select "Character Encoding" from the list of conversions.
 
 Плагін для gedit - перекодування файлу
