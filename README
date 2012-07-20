@@ -3,3 +3,12 @@
 В gedit Правка-Параметры-Модули поставить галку "Кодировка документа"
 В главном меню появится пункт "Кодировка" со списком перекодировок.
 
+Plugin for gedit - recoding the file
+For installation, run the install.sh
+In gedit Edit-Settings-Modules deliver daw "Character Encoding"
+In the main menu appears select "Character Encoding" from the list of conversions.
+
+Плагін для gedit - перекодування файлу
+Для установки запустити install.sh
+У gedit Правка-Параметри-Модулі поставити галку "Кодування"
+У головному меню з'явиться пункт "Кодування" зі списком перекодіровок.

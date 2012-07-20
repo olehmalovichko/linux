@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Open the document in a different encoding
 # Install: copy mencode.plugin and mencode.py to ~/.local/share/gedit/plugins/
 # Copyright (C) 2012 Oleg Malovichko privatbank@gmail.com
@@ -16,12 +15,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-# version 1.2
+# version 1.3
 
-from gettext import gettext as _
 from gi.repository import GObject, Gtk, Gedit, Gio
 import functools
-
+import gettext
+gettext.install('mencode', unicode=True)
 
 #all codepage list
 encs = []
@@ -79,8 +78,8 @@ UI_XML = """<ui>
 </ui>""" % "\n".join(["<menuitem name=\"Encoding%i\" action=\"Encoding%i\"/>" % (i, i) for i in range(len(enclist))])
 
 
-class ExamplePlugin04(GObject.Object, Gedit.WindowActivatable):
-    __gtype_name__ = "ExamplePlugin04"
+class MEncodePlugin(GObject.Object, Gedit.WindowActivatable):
+    __gtype_name__ = "MEncodePlugin"
     window = GObject.property(type=Gedit.Window)
    
     def __init__(self):
@@ -89,13 +88,10 @@ class ExamplePlugin04(GObject.Object, Gedit.WindowActivatable):
     def _add_ui(self):
         manager = self.window.get_ui_manager()
         
-        #action_filemenu = Gtk.ActionGroup("test", "File", None, None)
-        #self._actions.add_actions(action_filemenu)
-
         self._actions = Gtk.ActionGroup("rootMenuGroup")
         self._actions.add_actions([
-            ('rootMenuAction', Gtk.STOCK_UNDERLINE, "Кодировка", 
-                None, "Открыть текущий документ в другой кодировке", 
+            ('rootMenuAction', Gtk.STOCK_UNDERLINE, _("Character Encoding"), 
+                None, _("Open the document in different character encodings"), 
                 self.on_example_action_activate2),
         ])
         manager.insert_action_group(self._actions)
@@ -103,43 +99,35 @@ class ExamplePlugin04(GObject.Object, Gedit.WindowActivatable):
                 
         self._actions = Gtk.ActionGroup("SubMenu")
         self._actions.add_actions([
-            ('SubMenuAction', Gtk.STOCK_PASTE, "Другие кодировки", 
-                None, "Список кодировок", 
+            ('SubMenuAction', Gtk.STOCK_DND_MULTIPLE, _("More Encodings"), 
+                None, _("List codepages"), 
                 self.on_example_action_activate2),
         ])
         manager.insert_action_group(self._actions)
 
-#        self._actions = Gtk.ActionGroup("Example04Actions")
-#        self._actions.add_actions([
-#            ('ExampleAction', Gtk.STOCK_INFO, "Say _Hello", 
-#                None, "Say hello to the current document", 
-#                self.on_example_action_activate),
-#        ])
-#        manager.insert_action_group(self._actions)
-
 
         self._actions = Gtk.ActionGroup("group1251")
         self._actions.add_actions([
-            ('action1251', Gtk.STOCK_DND_MULTIPLE, "WINDOWS-1251",    None, "Документ в кодировку Windows-1251", 
+            ('action1251', Gtk.STOCK_DND_MULTIPLE, _("Cyrillic (Windows-1251)"),    None, _("Document to Windows-1251"), 
                  self.to_cp1251), ])
         manager.insert_action_group(self._actions)
         
         self._actions = Gtk.ActionGroup("group866")
         self._actions.add_actions([
-            ('action866', Gtk.STOCK_DND_MULTIPLE, "CP866",  None, "Документ в кодировку CP866", 
+            ('action866', Gtk.STOCK_DND_MULTIPLE, _("Cyrillic (CP-866)"),  None, _("Document to CP-866"), 
                  self.to_cp866), ])
         manager.insert_action_group(self._actions)
     
         self._actions = Gtk.ActionGroup("groupkoi8r")
         self._actions.add_actions([
-            ('actionkoi8r', Gtk.STOCK_DND_MULTIPLE, "KOI8R",  None, "Документ в кодировку KOI8R", 
+            ('actionkoi8r', Gtk.STOCK_DND_MULTIPLE, _("Cyrillic (KOI8-R)"),  None, _("Document to KOI8-R"), 
                  self.to_koi8r), ])
         manager.insert_action_group(self._actions)
         
 
         self._actions = Gtk.ActionGroup("grouputf8")
         self._actions.add_actions([
-            ('actionutf8', Gtk.STOCK_DND_MULTIPLE, "UTF-8",  None, "Документ в кодировку UTF-8", 
+            ('actionutf8', Gtk.STOCK_DND_MULTIPLE, _("Unicode (UTF-8)"),  None, _("Document to UTF-8"), 
                  self.to_utf8), ])
         manager.insert_action_group(self._actions)
 
@@ -147,7 +135,7 @@ class ExamplePlugin04(GObject.Object, Gedit.WindowActivatable):
         self._action_group = Gtk.ActionGroup("Codepage")
 
         self._action_group.add_actions([("Codepage", None, _("CODEPAGE:"))] + \
-           [("Encoding%i" % i, Gtk.STOCK_DND_MULTIPLE, enclist[i], None, _("Документ в кодировку ")+" "+enclist[i],
+           [("Encoding%i" % i, Gtk.STOCK_DND_MULTIPLE, enclist[i], None, _("Document to ")+" "+enclist[i],
            functools.partial(self.reopen_document, enc=enclist[i], ii=i )) \
            for i in range(len(enclist))])
         manager.insert_action_group(self._action_group, -1)
@@ -166,11 +154,6 @@ class ExamplePlugin04(GObject.Object, Gedit.WindowActivatable):
     def do_update_state(self):
         pass
     
-    def on_example_action_activate(self, action, data=None):
-        view = self.window.get_active_view()
-        if view:
-            view.get_buffer().insert_at_cursor("Hello World! %D0%97%D0%B0%D0%B3%D0%BB%D0%B0%D0%")
-            
     def on_example_action_activate2(self, action, data=None):
         view = self.window.get_active_view()
                

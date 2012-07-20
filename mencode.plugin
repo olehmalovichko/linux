@@ -4,10 +4,16 @@ Module=mencode
 IAge=1
 Name=mencode
 Name[ru]=Koдировка документа
+Name[ua]=Koдування документа
+
 Description=Open the document in a different encoding
 Description[ru]=Открыть документ в другой кодировке
+Description[ua]=Відкрити документ в іншому кодуванні
+
 Authors=Oleg Malovichko
 Authors[ru]=Олег Маловичко
+Authors[ua]=Олег Маловiчко
+
 Copyright=Copyright © 2012 Oleg Malovichko <privatbank@gmail.com>
 Website=http://privatbank.ua
 
