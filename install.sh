@@ -4,7 +4,7 @@
 user="user"
 
 lpath="/home/$user/.local/share/gedit/plugins"
-path_ua="/usr/share/locale/ua/LC_MESSAGES/mencode.mo"
+path_ua="/usr/share/locale/uk/LC_MESSAGES/mencode.mo"
 path_ru="/usr/share/locale/ru/LC_MESSAGES/mencode.mo"
 
 
